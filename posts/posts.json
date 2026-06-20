@@ -1,0 +1,15 @@
+{
+  "posts": [
+    {
+      "slug": "who-am-i",
+      "title": "Who am I?",
+      "date": "2026-06-20",
+      "excerpt": "Who am I, a short introduction.",
+      "tags": [
+        "Introduction"
+      ],
+      "readTime": "3 min read",
+      "file": "posts/who-am-i.md"
+    }
+  ]
+}

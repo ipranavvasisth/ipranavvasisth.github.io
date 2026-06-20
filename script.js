@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initSkillBars();
   initMobileMenu();
+  initProjectSlider();
+  initCertSlider();
 });
 
 /* ── Theme Toggle ─────────────────────────────────────── */
@@ -140,4 +142,177 @@ function initMobileMenu() {
       navLinks.classList.remove('open');
     }
   });
+}
+
+/* ── Projects Horizontal Slider ───────────────────────── */
+function initProjectSlider() {
+  const track = document.getElementById('projects-track');
+  const prevBtn = document.getElementById('slider-prev');
+  const nextBtn = document.getElementById('slider-next');
+  const dotsContainer = document.getElementById('slider-dots');
+
+  if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
+
+  const cards = track.querySelectorAll('.project-card');
+  if (cards.length === 0) return;
+
+  let currentIndex = 0;
+
+  // Build dot indicators
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to project ${i + 1}`);
+    dot.addEventListener('click', () => scrollToCard(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function scrollToCard(index) {
+    if (index < 0 || index >= cards.length) return;
+    currentIndex = index;
+    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    updateControls();
+  }
+
+  function updateControls() {
+    // Update arrow disabled state
+    prevBtn.disabled = currentIndex <= 0;
+    nextBtn.disabled = currentIndex >= cards.length - 1;
+
+    // Update dots
+    const dots = dotsContainer.querySelectorAll('.slider-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  // Arrow click handlers
+  prevBtn.addEventListener('click', () => scrollToCard(currentIndex - 1));
+  nextBtn.addEventListener('click', () => scrollToCard(currentIndex + 1));
+
+  // Sync dots & arrows when user scrolls manually (touch swipe, trackpad)
+  let scrollTimeout;
+  track.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      // Find which card is most visible
+      const trackRect = track.getBoundingClientRect();
+      let closestIndex = 0;
+      let closestDist = Infinity;
+
+      cards.forEach((card, i) => {
+        const cardRect = card.getBoundingClientRect();
+        const dist = Math.abs(cardRect.left - trackRect.left);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
+      });
+
+      currentIndex = closestIndex;
+      updateControls();
+    }, 100);
+  }, { passive: true });
+
+  // Keyboard support when slider is focused/hovered
+  track.setAttribute('tabindex', '0');
+  track.setAttribute('role', 'region');
+  track.setAttribute('aria-label', 'Project carousel');
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      scrollToCard(currentIndex - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      scrollToCard(currentIndex + 1);
+    }
+  });
+
+  // Initial state
+  updateControls();
+}
+
+/* ── Certifications Horizontal Slider ────────────────────── */
+function initCertSlider() {
+  const track = document.getElementById('certs-track');
+  const prevBtn = document.getElementById('cert-slider-prev');
+  const nextBtn = document.getElementById('cert-slider-next');
+  const dotsContainer = document.getElementById('cert-slider-dots');
+
+  if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
+
+  const cards = track.querySelectorAll('.cert-card');
+  if (cards.length === 0) return;
+
+  let currentIndex = 0;
+
+  // Build dot indicators
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to certification ${i + 1}`);
+    dot.addEventListener('click', () => scrollToCard(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function scrollToCard(index) {
+    if (index < 0 || index >= cards.length) return;
+    currentIndex = index;
+    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    updateControls();
+  }
+
+  function updateControls() {
+    prevBtn.disabled = currentIndex <= 0;
+    nextBtn.disabled = currentIndex >= cards.length - 1;
+
+    const dots = dotsContainer.querySelectorAll('.slider-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  // Arrow click handlers
+  prevBtn.addEventListener('click', () => scrollToCard(currentIndex - 1));
+  nextBtn.addEventListener('click', () => scrollToCard(currentIndex + 1));
+
+  // Sync dots & arrows when user scrolls manually
+  let scrollTimeout;
+  track.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const trackRect = track.getBoundingClientRect();
+      let closestIndex = 0;
+      let closestDist = Infinity;
+
+      cards.forEach((card, i) => {
+        const cardRect = card.getBoundingClientRect();
+        const dist = Math.abs(cardRect.left - trackRect.left);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
+      });
+
+      currentIndex = closestIndex;
+      updateControls();
+    }, 100);
+  }, { passive: true });
+
+  // Keyboard support
+  track.setAttribute('tabindex', '0');
+  track.setAttribute('role', 'region');
+  track.setAttribute('aria-label', 'Certification carousel');
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      scrollToCard(currentIndex - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      scrollToCard(currentIndex + 1);
+    }
+  });
+
+  // Initial state
+  updateControls();
 }
